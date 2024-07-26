@@ -18,36 +18,37 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/Product")
 public class ProductController {
 
 	@Autowired
-    private ProductRepository repository;
-    @GetMapping
-    public ResponseEntity getAllProducts(){
-        var allProducts = repository.findAll();
-        return ResponseEntity.ok(allProducts);
-    }
-
-    @PostMapping
-    public ResponseEntity registerProduct(@RequestBody @Valid RequestProduct data){
-        Product newProduct = new Product(data);
-        repository.save(newProduct);
-        return ResponseEntity.ok().build();
-    }
- 
-    @PutMapping
-    @Transactional
-    public ResponseEntity updateProduct(@RequestBody @Valid RequestProduct data){
-        Optional<Product> optionalProduct = repository.findById(data.id());
-        if (optionalProduct.isPresent()) {
-            Product product = optionalProduct.get();
-            product.setName(data.name());
-            product.setPrice_in_cents(data.price_in_cents());
-            return ResponseEntity.ok(product);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+	private ProductRepository productRepository;
 	
+	@GetMapping
+	public ResponseEntity  getAllProduct() {
+		var products = productRepository.findAll();
+		return ResponseEntity.ok(products);
+	}
+	
+	@PostMapping
+	public ResponseEntity postProduct(@RequestBody @Valid  RequestProduct product) {
+		Product prod = new Product(product);
+		var saveProduct = productRepository.save(prod);
+		return ResponseEntity.ok(saveProduct);
+	}
+	
+	@PutMapping
+	@Transactional
+	public ResponseEntity putProduct(@RequestBody @Valid  RequestProduct product) {
+		Optional<Product> optionsProduct = productRepository.findById(product.id());
+		
+		if(optionsProduct.isPresent()){
+			Product prod = optionsProduct.get();
+			prod.setName(product.name());
+			prod.setPrice_in_cents(product.price_in_cents());
+			return ResponseEntity.ok().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 }
